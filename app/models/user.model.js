@@ -10,13 +10,25 @@ const UserSchema = new mongoose.Schema({
 	country: mongoose.Schema.Types.String,
 	dob: mongoose.Schema.Types.String,
 	firstName: mongoose.Schema.Types.String,
-	lastName: mongoose.Schema.Types.String
+	lastName: mongoose.Schema.Types.String,
+	verifyLink: mongoose.Schema.Types.String,
+	verificationLevel: {type: mongoose.Schema.Types.Number, default: 0 }
 }, {
 	timestamps: true
 });
 
 UserSchema.methods.update = function(data) {
-	this.email = data.email;
+	let keys = Object.keys(data)
+	if (keys.includes('traderName'))
+		this.verificationLevel = 2;
+	keys.forEach(key => {
+		this[key] = data[key]
+	})
+}
+
+UserSchema.methods.verifyEmail = function() {
+	this.verificationLevel = 1;
+	this.verifyLink = undefined;
 }
 
 module.exports = mongoose.model('User', UserSchema);
